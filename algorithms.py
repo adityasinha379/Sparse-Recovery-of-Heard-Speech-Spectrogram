@@ -33,7 +33,7 @@ def acc_prox_grad(A,y,alpha,beta,lamda,iters):
         x = np.sign(descent)*np.maximum(np.abs(descent)-alpha*lamda,0)
         err.append(np.linalg.norm(np.dot(A,x)-y))
         
-    return x,v,err
+    return x,err
 
 def proj_subgrad(A,y,t,iters):
     m,n = np.shape(A)
@@ -46,7 +46,7 @@ def proj_subgrad(A,y,t,iters):
         x = z - np.dot( np.dot(A.T, np.linalg.inv(np.dot(A,A.T)) ), np.dot(A,z)-y )
         err.append(np.linalg.norm(np.dot(A,x)-y))
         
-    return x,v,err
+    return x,err
 
 def FrankWolfe(A,y,tau,gamma,iters):
     m,n = np.shape(A)
