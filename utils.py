@@ -22,7 +22,7 @@ def lagData(data, lags):
     for ii in range(len(lags)):
         # Shift the data matrix
         lag = lags[ii]
-        resp_shift = np.roll(data,lag,axis=0)
+        data_shift = np.roll(data,lag,axis=0)
         # Zero out the values that rolled over
         if lag<0:
             data_shift[lag:,:] = 0
@@ -90,16 +90,16 @@ def getSTRF(stimTrain, respTrain, lags=np.arange(26), lam=1e3):
     '''
     Input:
     StimTrain: frequency x time, the TF representation of the training stimulus
-    respTrain: time x channel, the neural responses to the training stimulus
+    respTrain: channel x time, the neural responses to the training stimulus
     lags: are the time delays of the resp used for the estimation
         Default: 0 to 25
     Output:
     g: STRF
     '''
     # stimLag: time x freq*len(lags)
-    stimLag = lagResp(stimTrain.T, lags)
+    stimLag = lagData(stimTrain.T, lags)
     RR = stimLag.T @ stimLag
-    RS = respTrain.T @ stimLag
+    RS = respTrain @ stimLag
     # Normalize RR
     U, S, Vt = svd(RR)
     S_norm = S/sum(S)
@@ -116,3 +116,57 @@ def getSTRF(stimTrain, respTrain, lags=np.arange(26), lam=1e3):
     g = RR_inv @ RS.T
 
     return g
+
+def getX(subjID, trial):
+    
+    filename = 'Data/'+str(subjID).zfill(3)+'.hdf5'
+    data = h5py.File(filename)
+    
+    spec = data[trial]['spec'][:,:]
+    # 0-350 ms lags
+    specLag = lagData(spec.T, np.arange(36))
+    specLag = specLag.T
+    
+    data.close()
+    
+    return specLag
+
+def getY(subjID, trial):
+    
+    filename = 'Data/'+str(subjID).zfill(3)+'.hdf5'
+    data = h5py.File(filename)
+    
+    resp = data[trial]['resp'][:,:]
+
+    data.close()
+    resp = filterResp(resp, fc=8)
+    
+    return resp
+
+def getA(subjID, trial, lam=1e2):
+    
+    filename = 'Data/'+str(subjID).zfill(3)+'.hdf5'
+    data = h5py.File(filename)
+    
+    resp = data[trial]['resp'][:,:]
+    spec = data[trial]['spec'][:,:]
+    data.close()
+    
+    resp = filterResp(resp, fc=8)
+    
+    strf = getSTRF(spec, resp, lags=np.arange(36), lam=lam)
+    strf = strf.T
+    
+    return strf
+
+def filterResp(resp, fc=8):
+    
+    # Define filter (resp is fs=100 Hz)
+    b = sig.firwin(101, fc, fs=100)
+    # Filter response
+    respFilt = sig.filtfilt(b=b, a=1, x=resp, axis=1)
+    
+    return respFilt
+
+def saturate(x, a=5):
+    return a*np.tanh(x/a)
