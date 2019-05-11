@@ -1,1 +1,3 @@
-# Sparse-Recovery-of-Heard-Speech-Spectrogram
+# Sparse Recovery of Heard Speech Spectrogram
+
+Reconstruction of heard speech spectrograms from neural data is important in areas like auditory attention decoding and communicating with locked-in patients. For this problem, we receive the neural responses from multiple channels of electroencephalogram (EEG) recordings over time as measurements and use pre-learned spectro-temporal receptive fields (STRFs) as the sensing matrix. From this data, we perform a sparse reconstruction of the original heard speech power spectrogram, which outperforms dense reconstruction due to the inherent sparsity in a speech power-spectrogram.
