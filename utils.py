@@ -33,6 +33,51 @@ def lagData(data, lags):
 
     return dataLag
 
+def delagData(dataLag, lags=np.arange(36), mode='mean'):
+    '''
+    Inputs:
+    dataLag: time x features*len(lags)
+    lags: list/1D array of lag indices
+        Should be negative for resp, positive for spec
+    Outputs:
+    data: time x feature, (resp or spec)
+    '''
+    dataAligned = np.zeros_like(dataLag)
+    nChan = dataLag.shape[1]//len(lags)
+    data = np.zeros((dataLag.shape[0],
+                     nChan))
+    for ii in range(len(lags)):
+        # Realign each the data matrix
+        data_sub = dataLag[:, ii*nChan:(ii+1)*nChan]
+        lag = lags[ii]
+        data_shift = np.roll(data_sub,-lag,axis=0)        
+        # Zero out the values that rolled over
+        if lag<0:
+            data_shift[lag:,:] = 0
+        else:
+            data_shift[:lag,:] = 0
+        # Put this lagged data in the full matrix
+        dataAligned[:, ii*nChan:(ii+1)*nChan] = data_shift
+
+    # Merge all aligned data
+    dataAligned = dataAligned.reshape((data.shape[0],
+                                       len(lags),
+                                       nChan))
+    dataAligned = np.transpose(dataAligned, (0,2,1))
+    if mode=='mean':
+        data = np.mean(dataAligned, axis=2)
+    elif mode=='median':
+        data = np.median(dataAligned, axis=2)
+    elif mode=='sparse':
+        data = np.mean(dataAligned, axis=2)
+        data_prod = np.prod(dataAligned, axis=2)
+        data[data_prod == 0] = 0
+    else:
+        raise ValueError(
+            'Mode not implemented. Try "mean" or "median"')
+
+    return data
+
 def convertHDF5(filenameIn, filenameOut):
 
     dataIn = h5py.File(filenameIn)
