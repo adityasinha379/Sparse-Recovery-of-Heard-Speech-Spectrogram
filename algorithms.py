@@ -40,7 +40,6 @@ def acc_prox_grad(A,y,alpha,beta,lamda,iters):
 def proj_subgrad(A,y,t,iters):
     m,n = np.shape(A)
     x = np.zeros(n)
-    z = np.zeros(n)
     
     err = []
     for k in range(iters):
