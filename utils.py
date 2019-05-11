@@ -170,3 +170,19 @@ def filterResp(resp, fc=8):
 
 def saturate(x, a=5):
     return a*np.tanh(x/a)
+
+def show_result(A,Y,X,x,err,t):
+    plt.plot(err)
+    print(err[-1])
+    plt.show()
+    plt.subplot(311)
+    plt.plot(X[:,t])
+    plt.subplot(312)
+    plt.plot(x)
+    plt.subplot(313)
+    temp = np.linalg.pinv(A)@Y
+    plt.plot(temp[:,t])
+    print('Error in objective (sparse) : ',err[-1])
+    print('Error in objective (dense) : ',np.linalg.norm(np.dot(A,temp[:,t])-Y[:,t]))
+    print('Error in x (sparse) : ',np.linalg.norm(X[:,t]-x))
+    print('Error in x (dense) : ',np.linalg.norm(X[:,t]-temp[:,t]))
