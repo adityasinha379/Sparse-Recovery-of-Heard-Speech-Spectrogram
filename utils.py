@@ -173,7 +173,6 @@ def saturate(x, a=5):
 
 def show_result_single(A,Y,X,x,err,t):
     plt.plot(err)
-    print(err[-1])
     plt.show()
     plt.subplot(311)
     plt.plot(X[:,t])
@@ -189,7 +188,6 @@ def show_result_single(A,Y,X,x,err,t):
 
 def show_result(A,Y,X,X_rec,err):
     plt.plot(err)
-    print(err[-1])
     plt.show()
     temp = np.linalg.pinv(A)@Y
     print('Error in objective (sparse) : ',err[-1])
