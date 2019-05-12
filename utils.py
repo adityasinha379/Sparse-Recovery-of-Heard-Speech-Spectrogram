@@ -36,12 +36,14 @@ def lagData(data, lags):
 def delagData(dataLag, lags=np.arange(36), mode='mean'):
     '''
     Inputs:
-    dataLag: time x features*len(lags)
+    dataLag: features*len(lags) x time
     lags: list/1D array of lag indices
         Should be negative for resp, positive for spec
     Outputs:
-    data: time x feature, (resp or spec)
+    data: feature x time, (resp or spec)
     '''
+    dataLag = dataLag.T
+    
     dataAligned = np.zeros_like(dataLag)
     nChan = dataLag.shape[1]//len(lags)
     data = np.zeros((dataLag.shape[0],
@@ -75,6 +77,8 @@ def delagData(dataLag, lags=np.arange(36), mode='mean'):
     else:
         raise ValueError(
             'Mode not implemented. Try "mean" or "median"')
+        
+    data = data.T
 
     return data
 

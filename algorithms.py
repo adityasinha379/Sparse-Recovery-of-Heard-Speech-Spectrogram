@@ -76,7 +76,8 @@ def FrankWolfe(A,y,tau,iters):
         xprev = x
         gamma = 2/(k+2)
         grad = np.dot(A.T,np.dot(A,x)-y)
-        v = -tau*np.sign(grad)*np.array(np.abs(grad)==np.max(np.abs(grad))) #l_inf norm (to find one of the extreme points of L1 ball)
+        #l_inf norm (to find one of the extreme points of L1 ball)
+        v = -tau*np.sign(grad)*np.array(np.abs(grad)==np.max(np.abs(grad))) 
         x = (1-gamma)*x + gamma*v
         err.append(np.linalg.norm(np.dot(A,x)-y))
         if(np.linalg.norm(x-xprev)<1e-3):
